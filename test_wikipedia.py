@@ -32,6 +32,7 @@ class WikipediaCommon(unittest.TestCase):
 	def tearDown(self):
 		self.driver.quit()
 
+@unittest.skip('')
 class TestHomePage(WikipediaCommon):
 
 	@unittest.skip('')
@@ -155,7 +156,7 @@ class TestHomePage(WikipediaCommon):
 		self.assertEqual(title_text, self.main.get_page_title())
 		self.assertIn(body_text, self.main.get_body_text().replace("\n", ''))
 
-
+@unittest.skip('')
 class TestMainPage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -228,6 +229,7 @@ class TestArticlePage(WikipediaCommon):
 	#       if value is None then label is not expected in info box
 	def infobox_test(self, search_term, expected_values):
 		main = pages.MainPage(self.driver)
+		main.open_main_page()
 		main.open_article_by_search(search_term)
 
 		article = pages.ArticlePage(self.driver)
@@ -267,37 +269,37 @@ class TestArticlePage(WikipediaCommon):
 		
 		return return_list
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_infobox_for_country(self):
 		expected_values = self.create_expected_values(
 			('Currency', "Sol"), ('Capital', "Lima"))
 		self.infobox_test("Peru", expected_values)
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_infobox_for_chemistry(self):
 		expected_values = self.create_expected_values(
 			('atomic weight', "15.999"), ('Phase at STP', "gas"))
 		self.infobox_test("Oxygen", expected_values)
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_infobox_for_person(self):
 		expected_values = self.create_expected_values(
 			('Born', '1889'), ('Relatives', 'Chaplin'))
 		self.infobox_test("Charlie Chaplin", expected_values)
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_infobox_for_movie(self):
 		expected_values = self.create_expected_values(
 			('Directed', 'Alfred Hitchcock'), ('Starring', 'Cary Grant'))
 		self.infobox_test("north by northwest", expected_values)
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_infobox_for_holiday(self):
 		expected_values = self.create_expected_values(
 			('Significance', 'pranks'), ('Frequency', 'Annual'))
 		self.infobox_test("april fool's day", expected_values)
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_infobox_for_song(self):
 		expected_values = self.create_expected_values(
 			('Recorded', '1968'), ('Songwriter(s)', 'Lennon'))
