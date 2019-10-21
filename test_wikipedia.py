@@ -57,42 +57,34 @@ class TestHomePage(WikipediaCommon):
 		self.verify_suggestions_contain("Buster Keaton")
 		self.verify_suggestions_do_not_contain("Busta Rhymes")
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_homepage_english_link(self):
 		self.open_home_page()
-		self.home.click_language_link('English')
-
-		self.main = pages.MainPage(self.driver)
+		self.click_language_link('English')
 		self.verify_main_page_text(
 			title_text="Wikipedia, the free encyclopedia",
 			body_text="the free encyclopedia that anyone can edit")
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_homepage_french_link(self):
 		self.open_home_page()
-		self.home.click_language_link('Français')
-
-		self.main = pages.MainPage(self.driver)
+		self.click_language_link('Français')
 		self.verify_main_page_text(
 			title_text="Wikipédia, l'encyclopédie libre",
 			body_text="L'encyclopédie libre que chacun peut améliorer")
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_homepage_german_link(self):
 		self.open_home_page()
-		self.home.click_language_link('Deutsch')
-
-		self.main = pages.MainPage(self.driver)
+		self.click_language_link('Deutsch')
 		self.verify_main_page_text(
 			title_text="Wikipedia – Die freie Enzyklopädie",
 			body_text="Wikipedia ist ein Projekt zum Aufbau einer Enzyklopädie aus freien Inhalten")
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_homepage_spanish_link(self):
 		self.open_home_page()
-		self.home.click_language_link('Español')
-
-		self.main = pages.MainPage(self.driver)
+		self.click_language_link('Español')
 		self.verify_main_page_text(
 			title_text="Wikipedia, la enciclopedia libre",
 			body_text="la enciclopedia de contenido libreque todos pueden editar")
@@ -113,6 +105,9 @@ class TestHomePage(WikipediaCommon):
 		self.open_home_page()
 		self.home.enter_search_term(search_term)
 		self.home.submit_search()
+
+	def click_language_link(self, lang):
+		self.home.click_language_link(lang)
 
 	def verify_article_page(self, search_term):
 		# check the resulting page has the correct header & title
@@ -146,8 +141,17 @@ class TestHomePage(WikipediaCommon):
 		error_msg = "'{}' found in titles {}"
 		matching = [title for title in titles if title.startswith(search_str)]
 		self.assertEqual(matching, [], error_msg.format(search_str, titles))
-		
+	
+	# Verify text on the main page
+	# Parameters
+	#   title_text - expected text in the title (browser tab)
+	#   body_text - expected text somewhere in body
+	#
+	# declare a main-page object
+	# asserts the title/tab is the expected text
+	# asserts the page body contains the expected text
 	def verify_main_page_text(self, title_text, body_text):
+		self.main = pages.MainPage(self.driver)
 		self.assertEqual(title_text, self.main.get_page_title())
 		self.assertIn(body_text, self.main.get_body_text().replace("\n", ''))
 
@@ -363,3 +367,4 @@ if __name__ == '__main__':
 		unittest.main(verbosity=2)
 	else:
 		print("Argument missing or invalid. Expected one of",str(supported_browsers)[1:-1])
+
