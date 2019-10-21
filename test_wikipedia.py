@@ -363,13 +363,3 @@ if __name__ == '__main__':
 		unittest.main(verbosity=2)
 	else:
 		print("Argument missing or invalid. Expected one of",str(supported_browsers)[1:-1])
-
-
-"""
-
-	TO-DO
-
-	Refactor test_mainpage_autosuggest to test titles returned begin with search
-	  insert spaces, which should be ignored
-
-"""
