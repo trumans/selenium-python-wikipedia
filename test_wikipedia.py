@@ -90,9 +90,9 @@ class TestHomePage(WikipediaCommon):
 			title_text="Wikipedia, la enciclopedia libre",
 			body_text="la enciclopedia de contenido libreque todos pueden editar")
 
-	###############################
-	# Home page support functions
-	###############################
+	#####################
+	# Support functions
+	#####################
 
 	# create the home page object and open the page
 	def open_home_page(self):
@@ -185,6 +185,10 @@ class TestMainPage(WikipediaCommon):
 		self.type_search("glas") # extend search term
 		self.verify_suggestions_start_with("douglas")
 
+	#####################
+	# Support functions
+	#####################
+
 	def open_main_page(self):
 		self.main = pages.MainPage(self.driver)
 		self.main.open_main_page()
@@ -216,106 +220,81 @@ class TestMainPage(WikipediaCommon):
 		self.assertNotIn(omitted_suggestion, titles)
 
 
-
+#@unittest.skip('')
 class TestArticlePage(WikipediaCommon):
-
-	# Template for testing info box contents
-	# Parameters:
-	#   search_term: search text to open an article. 
-	#     assumes search does not open a disambiguration page
-	#   expected_value: list of (label, value) tuples where 
-	#     label is a string contained in the left side of a row in info box
-	#     value is a string contained in value on the right side.
-	#       if value is None then label is not expected in info box
-	def infobox_test(self, search_term, expected_values):
-		main = pages.MainPage(self.driver)
-		main.open_main_page()
-		main.open_article_by_search(search_term)
-
-		article = pages.ArticlePage(self.driver)
-		info = article.get_infobox_contents()
-		for (label, expected_value) in expected_values:
-			found_value = article.get_value_from_infobox_contents(info, label)
-			if expected_value == None:
-				self.assertEqual(None, found_value)
-			else:
-				self.assertIn(expected_value, found_value)
-
-	# Return the list of labels, value pairs for testing info box
-	# The expected value for each label is None (not present in infox) by default, 
-	# but is overriden by the tuples passed through args parameter.
-	def create_expected_values(self, *args):
-		return_list = [
-			('Directed', None), ('Starring', None),            # movies
-			('Born', None), ('Relatives', None),               # people
-			('atomic weight', None), ('Phase at STP', None),   # chemical element
-			('Currency', None), ('Capital', None),             # countries
-			('Significance', None), ('Frequency', None),       # holidays
-			('Songwriter(s)', None), ('Recorded', None)        # song
-		]
-		new_pairs = list(args)
-		for idx in range(0, len(return_list)):
-			for pair in new_pairs:
-				if return_list[idx][0] == pair[0]: 
-					return_list[idx] = pair 
-					new_pairs.remove(pair)  # remove after it's inserted into return list
-					break
-			if not new_pairs:  # break main loop if no args left to insert
-				break
-
-		# insert any remaining args into return list
-		for pair in new_pairs:
-			return_list.append(pair)
-		
-		return return_list
 
 	#@unittest.skip('')
 	def test_infobox_for_country(self):
-		expected_values = self.create_expected_values(
-			('Currency', "Sol"), ('Capital', "Lima"))
+		expected_values = (('Currency', "Sol"), ('Capital', "Lima"))
 		self.infobox_test("Peru", expected_values)
 
 	#@unittest.skip('')
 	def test_infobox_for_chemistry(self):
-		expected_values = self.create_expected_values(
-			('atomic weight', "15.999"), ('Phase at STP', "gas"))
+		expected_values = (('atomic weight', "15.999"), ('Phase at STP', "gas"))
 		self.infobox_test("Oxygen", expected_values)
 
 	#@unittest.skip('')
 	def test_infobox_for_person(self):
-		expected_values = self.create_expected_values(
-			('Born', '1889'), ('Relatives', 'Chaplin'))
+		expected_values = (('Born', '1889'), ('Relatives', 'Chaplin'))
 		self.infobox_test("Charlie Chaplin", expected_values)
 
 	#@unittest.skip('')
 	def test_infobox_for_movie(self):
-		expected_values = self.create_expected_values(
-			('Directed', 'Alfred Hitchcock'), ('Starring', 'Cary Grant'))
+		expected_values = (('Directed', 'Alfred Hitchcock'), ('Starring', 'Cary Grant'))
 		self.infobox_test("north by northwest", expected_values)
 
 	#@unittest.skip('')
 	def test_infobox_for_holiday(self):
-		expected_values = self.create_expected_values(
-			('Significance', 'pranks'), ('Frequency', 'Annual'))
+		expected_values = (('Significance', 'pranks'), ('Frequency', 'Annual'))
 		self.infobox_test("april fool's day", expected_values)
 
 	#@unittest.skip('')
 	def test_infobox_for_song(self):
-		expected_values = self.create_expected_values(
-			('Recorded', '1968'), ('Songwriter(s)', 'Lennon'))
+		expected_values = (('Recorded', '1968'), ('Songwriter(s)', 'Lennon'))
 		self.infobox_test("rocky raccoon", expected_values)
 
-	@unittest.skip('')
-	def test_compare_toc_to_headlines(self):
-		main = pages.MainPage(self.driver)
-		main.open_main_page()
-		main.open_article_by_search("Douglas Adams")
+	#@unittest.skip('')
+	def test_compare_toc_and_headlines(self):
+		self.open_article_by_search("Douglas Adams")
+		self.verify_article_toc_and_headers()
+
+	#####################
+	# Support functions
+	#####################
+
+	def open_article_by_search(self, search_term):
+		self.main = pages.MainPage(self.driver)
+		self.main.open_main_page()
+		self.main.open_article_by_search(search_term)
+
+	# Template for testing info box contents
+	# Parameters:
+	#   search_term: search text to open an article.
+	#     assumes search does not open a disambiguration page
+	#   expected_value: list of (label, value) tuples where
+	#     label is a string contained in the left side of a row in info box
+	#     value is a string contained in value on the right side
+	def infobox_test(self, search_term, expected_values):
+		self.open_article_by_search(search_term)
 
 		article = pages.ArticlePage(self.driver)
+		infobox = article.get_infobox_contents()
+
+		# check expected values are in info box
+		for (label, expected_value) in expected_values:
+			found_value = article.get_value_from_infobox_contents(infobox, label)
+			self.assertIn(expected_value, found_value)
+
+	def verify_article_toc_and_headers(self):
+		article = pages.ArticlePage(self.driver)
 		toc = article.get_toc_items_text()
+		self.assertTrue(len(toc) > 0, "TOC is empty")
 		headlines = article.get_headlines_text()
+		self.assertTrue(len(headlines) > 0, "No headlines found")
 		self.assertEqual(toc, headlines)
 
+
+@unittest.skip('')
 class TestCurrentEventsPage(WikipediaCommon):
 
 	# Verify the contents of the current 'current events' page
