@@ -3,7 +3,7 @@ The project demonstrates Selenium with Python used in a page-object model to ver
 
 Project organization
 * test_wikipedia.py - test cases are defined in the test_* methods in the Test* classes. Also defined in the Test* classes are supporting methods which are intermediaries between the tests case and page class methods.
-* pages.py - \*Page classes which contain web element locators and methods to interact with them.
+* pages.py - \*Page classes contain web element locators and methods to interact with them.
 
 
 # Prerequisites #
