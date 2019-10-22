@@ -1,9 +1,9 @@
 
-The project demonstrates Selenium with Python used in a page-object model to verify web elements on the Wikipedia.org site. Test cases are defined with the unittest framework.
+The project demonstrates Selenium WebDriver with Python and page-object model to verify web elements on Wikipedia.org. Test cases are defined with the PyUnit/unittest framework.
 
 Project organization
-* test_wikipedia.py - test cases are defined in the test_* methods in the Test* classes. Also defined in the Test* classes are supporting methods which are intermediaries between the tests case and page class methods.
-* pages.py - \*Page classes contain web element locators and methods to interact with them.
+* **test_wikipedia.py** - defines test cases using the PyUnit convention of method names beginning with "test_" in the class names beginning with "Test". Test case methods call helper functions defined in the same class which create page object instances and call related methods. This aids readability by allowing tests definitions to have a concise sequence of function calls.
+* **pages.py** - defines classes for each page containing web element locators and methods to interact with the elements.
 
 
 # Prerequisites #
