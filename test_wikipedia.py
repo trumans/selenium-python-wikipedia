@@ -90,9 +90,9 @@ class TestHomePage(WikipediaCommon):
 			title_text="Wikipedia, la enciclopedia libre",
 			body_text="la enciclopedia de contenido libreque todos pueden editar")
 
-	#####################
-	# Support functions
-	#####################
+	####################
+	# Helper functions
+	####################
 
 	# create the home page object and open the page
 	def open_home_page(self):
@@ -185,9 +185,9 @@ class TestMainPage(WikipediaCommon):
 		self.type_search("glas") # extend search term
 		self.verify_suggestions_start_with("douglas")
 
-	#####################
-	# Support functions
-	#####################
+	####################
+	# Helper functions
+	####################
 
 	def open_main_page(self):
 		self.main = pages.MainPage(self.driver)
@@ -258,9 +258,9 @@ class TestArticlePage(WikipediaCommon):
 		self.open_article_by_search("Douglas Adams")
 		self.verify_article_toc_and_headers()
 
-	#####################
-	# Support functions
-	#####################
+	####################
+	# Helper functions
+	####################
 
 	def open_article_by_search(self, search_term):
 		self.main = pages.MainPage(self.driver)
