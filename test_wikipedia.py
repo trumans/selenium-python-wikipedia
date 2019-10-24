@@ -32,15 +32,15 @@ class WikipediaCommon(unittest.TestCase):
 	def tearDown(self):
 		self.driver.quit()
 
-@unittest.skip('')
+#@unittest.skip('')
 class TestHomePage(WikipediaCommon):
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_homepage_title(self):
 		self.open_home_page()
 		self.verify_home_page_title()
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	# Safari doesn't display a tab unless multiple tabs are open.
 	def test_homepage_article_search(self):
 		search_term = "Buster Keaton"
@@ -48,7 +48,7 @@ class TestHomePage(WikipediaCommon):
 		self.submit_search(search_term)
 		self.verify_article_page(search_term)
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_homepage_autosuggest(self):
 		self.open_home_page()
 		self.type_search("bust")
@@ -156,7 +156,7 @@ class TestHomePage(WikipediaCommon):
 		self.assertEqual(title_text, self.main.get_page_title())
 		self.assertIn(body_text, self.main.get_body_text().replace("\n", ''))
 
-@unittest.skip('')
+#@unittest.skip('')
 class TestMainPage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -294,7 +294,7 @@ class TestArticlePage(WikipediaCommon):
 		self.assertEqual(toc, headlines)
 
 
-@unittest.skip('')
+#@unittest.skip('')
 class TestCurrentEventsPage(WikipediaCommon):
 
 	# Verify the contents of the current 'current events' page
@@ -314,7 +314,7 @@ class TestCurrentEventsPage(WikipediaCommon):
 		# days are in descending order
 		self.assertEqual(days, sorted(days, reverse=(not days_ascending)))
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_main_current_events_page(self):
 		main = pages.MainPage(self.driver)
 		main.open_main_page()
@@ -324,7 +324,7 @@ class TestCurrentEventsPage(WikipediaCommon):
 		self.verify_current_events_page(
 			now.strftime('%B'), now.strftime('%Y'), ascending)
 
-	@unittest.skip('')
+	#@unittest.skip('')
 	def test_main_archive_current_events_page(self):
 		main = pages.MainPage(self.driver)
 		main.open_main_page()
