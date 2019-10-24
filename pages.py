@@ -130,6 +130,10 @@ class BasePage(object):
 
 		return suggestions
 
+	# regex to match dates formatted "June 20, 2019 (Thursday)"
+	#   allowing for text between date and day-of-week
+	long_date_regex = r'(January|February|March|April|May|June|July|August|September|October|November|December)\s([1-9][0-9]?),\s(\d{4}).*\((Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\)'
+
 	def month_index(self, month_name):
 		months = {
 			"January":   1,
@@ -306,9 +310,6 @@ class CurrentEventsPage(BasePage):
 
 	date_header = (By.CSS_SELECTOR, "[role='heading'] [class='summary']")
 	events_by_month_box = (By.CSS_SELECTOR, "[aria-labelledby='Events_by_month']")
-	# regex to match dates formatted "June 20, 2019 (Thursday)"
-	#   allowing for text between date and day-of-week
-	simple_date_regex = r'(January|February|March|April|May|June|July|August|September|October|November|December)\s([1-9][0-9]?),\s(\d{4}).*\((Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\)'
 
 	# Open the page for current events archive for a month and year
 	#   using links at the bottom of current events page
@@ -334,7 +335,7 @@ class CurrentEventsPage(BasePage):
 	#   header_text - text to parse date components from
 	# Returns a tuple of the four strings
 	def parse_date_header(self, header_text):
-		m = re.search(self.simple_date_regex, header_text)
+		m = re.search(self.long_date_regex, header_text)
 		return (m[1], m[2], m[3], m[4])
 
 

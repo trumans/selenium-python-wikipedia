@@ -32,7 +32,7 @@ class WikipediaCommon(unittest.TestCase):
 	def tearDown(self):
 		self.driver.quit()
 
-#@unittest.skip('')
+@unittest.skip('')
 class TestHomePage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -156,7 +156,7 @@ class TestHomePage(WikipediaCommon):
 		self.assertEqual(title_text, self.main.get_page_title())
 		self.assertIn(body_text, self.main.get_body_text().replace("\n", ''))
 
-#@unittest.skip('')
+@unittest.skip('')
 class TestMainPage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -220,7 +220,7 @@ class TestMainPage(WikipediaCommon):
 		self.assertNotIn(omitted_suggestion, titles)
 
 
-#@unittest.skip('')
+@unittest.skip('')
 class TestArticlePage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -304,7 +304,7 @@ class TestCurrentEventsPage(WikipediaCommon):
 
 		days = []
 		for date in dates:
-			self.assertRegex(date, ce.simple_date_regex)  # header is expected format
+			self.assertRegex(date, ce.long_date_regex)  # header is expected format
 			date_parsed = ce.parse_date_header(date)
 			self.assertEqual(month, date_parsed[0])  # current month
 			self.assertEqual(year, date_parsed[2])  # current year
