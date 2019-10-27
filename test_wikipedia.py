@@ -297,8 +297,44 @@ class TestArticlePage(WikipediaCommon):
 #@unittest.skip('')
 class TestCurrentEventsPage(WikipediaCommon):
 
-	# Verify the contents of the current 'current events' page
-	def verify_current_events_page(self, month, year, days_ascending=True):
+	#@unittest.skip('')
+	def test_main_current_events_page(self):
+		self.navigate_to_current_events_page()
+		now = datetime.datetime.now()
+		self.verify_date_headers(
+			now.strftime('%B'), now.strftime('%Y'), days_ascending=False)
+
+	#@unittest.skip('')
+	def test_main_archive_current_events_page(self):
+		self.navigate_to_current_events_page()
+		month, year = self.select_random_month_year()
+		self.verify_date_headers(month, year, days_ascending=True)
+
+	def navigate_to_current_events_page(self):
+		self.main = pages.MainPage(self.driver)
+		self.main.open_main_page()
+		self.main.click_left_panel_link("Current events")
+
+	# Randomly select a month from the archives at the bottom of the page
+	#   only selects from the full years
+	# Returns the tuple (month, year) which was selected
+	def select_random_month_year(self):
+		year = str(random.randint(1995, 2018))  # update to include latest full year
+		month = self.main.month_name(random.randint(1,12))
+		print("Verifying {} {}".format(month, year))
+		ce = pages.CurrentEventsPage(self.driver)
+		ce.click_link_archived_month(month, year)
+		return (month, year)
+
+	# Verify the headers for dates
+	#   verify headers are the expected format (ex: Janurary 1, 1999 (Monday))
+	#   verify dates are in sequence
+	# Parameters
+	#   month - string, full spelling of a month
+	#   year - string, YYYY format
+	#   days_ascending - boolean, dates should be in ascending order if True
+	#                    in descending order if False
+	def verify_date_headers(self, month, year, days_ascending=True):
 		ce = pages.CurrentEventsPage(self.driver)
 		dates = ce.get_date_headers()
 
@@ -306,37 +342,13 @@ class TestCurrentEventsPage(WikipediaCommon):
 		for date in dates:
 			self.assertRegex(date, ce.long_date_regex)  # header is expected format
 			date_parsed = ce.parse_date_header(date)
-			self.assertEqual(month, date_parsed[0])  # current month
-			self.assertEqual(year, date_parsed[2])  # current year
-			days.append( (int(date_parsed[2]), 
+			self.assertEqual(month, date_parsed[0])     # expected month
+			self.assertEqual(year, date_parsed[2])      # expected year
+			days.append( (int(date_parsed[2]),
 				          ce.month_index(date_parsed[0]), 
 				          int(date_parsed[1])) )	
-		# days are in descending order
+		# days are in expected sequence
 		self.assertEqual(days, sorted(days, reverse=(not days_ascending)))
-
-	#@unittest.skip('')
-	def test_main_current_events_page(self):
-		main = pages.MainPage(self.driver)
-		main.open_main_page()
-		main.click_left_panel_link("Current events")
-		now = datetime.datetime.now()
-		ascending = False
-		self.verify_current_events_page(
-			now.strftime('%B'), now.strftime('%Y'), ascending)
-
-	#@unittest.skip('')
-	def test_main_archive_current_events_page(self):
-		main = pages.MainPage(self.driver)
-		main.open_main_page()
-		main.click_left_panel_link("Current events")
-		# Randomly select month and year from full years. TO-DO select from entire archive
-		year = str(random.randint(1995, 2018)) 
-		month = main.month_name(random.randint(1,12))
-		print("Verifying {} {}".format(month, year))
-		ascending = True
-		ce = pages.CurrentEventsPage(self.driver)
-		ce.click_link_archived_month(month, year)
-		self.verify_current_events_page(month, year, ascending)
 
 
 if __name__ == '__main__':
