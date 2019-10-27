@@ -32,7 +32,7 @@ class WikipediaCommon(unittest.TestCase):
 	def tearDown(self):
 		self.driver.quit()
 
-@unittest.skip('')
+#@unittest.skip('')
 class TestHomePage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -52,11 +52,9 @@ class TestHomePage(WikipediaCommon):
 	def test_homepage_autosuggest(self):
 		self.open_home_page()
 		self.type_search("bust")
-		self.verify_suggestions_contain("Busta Rhymes")
-		self.verify_suggestions_contain("Buster Posey")
+		self.verify_suggestions_start_with("bust")
 		self.type_search("er")
-		self.verify_suggestions_contain("Buster Keaton")
-		self.verify_suggestions_do_not_contain("Busta Rhymes")
+		self.verify_suggestions_start_with("buster")
 
 	#@unittest.skip('')
 	def test_homepage_english_link(self):
@@ -129,6 +127,16 @@ class TestHomePage(WikipediaCommon):
 	def type_search(self, search_term):
 		self.home.enter_search_term(search_term)
 
+	def verify_suggestions_start_with(self, search_term):
+		prefix = search_term.lower()
+		for suggestion in self.home.get_search_suggestions():
+			title = suggestion['title'].lower()
+			self.assertTrue(title.startswith(prefix),
+				"Suggestion '{}' expected to start with '{}'".format(title, prefix))
+
+	'''
+    NO LONGER USED. REMOVED IN THE FUTURE
+
 	def verify_suggestions_contain(self, search_str):
 		suggestions = self.home.get_search_suggestions()
 		titles = [suggestion['title'] for suggestion in suggestions]
@@ -142,7 +150,8 @@ class TestHomePage(WikipediaCommon):
 		error_msg = "'{}' found in titles {}"
 		matching = [title for title in titles if title.startswith(search_str)]
 		self.assertEqual(matching, [], error_msg.format(search_str, titles))
-	
+	'''
+
 	# Verify text on the main page
 	# Parameters
 	#   title_text - expected text in the title (browser tab)
@@ -207,6 +216,9 @@ class TestMainPage(WikipediaCommon):
 			self.assertTrue(title.startswith(prefix), 
 				"Suggestion '{}' expected to start with '{}'".format(title, prefix))
 
+'''
+    NO LONGER USED. REMOVED IN THE FUTURE
+
 	def verify_suggestions_contain(self, expected_suggestion):
 		titles = []
 		for suggestion in self.main.get_header_search_suggestions():
@@ -218,7 +230,7 @@ class TestMainPage(WikipediaCommon):
 		for suggestion in self.main.get_header_search_suggestions():
 			titles.append(suggestion['title'])
 		self.assertNotIn(omitted_suggestion, titles)
-
+'''
 
 @unittest.skip('')
 class TestArticlePage(WikipediaCommon):
@@ -294,7 +306,7 @@ class TestArticlePage(WikipediaCommon):
 		self.assertEqual(toc, headlines)
 
 
-#@unittest.skip('')
+@unittest.skip('')
 class TestCurrentEventsPage(WikipediaCommon):
 
 	#@unittest.skip('')
