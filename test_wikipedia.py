@@ -305,10 +305,14 @@ class TestCurrentEventsPage(WikipediaCommon):
 			now.strftime('%B'), now.strftime('%Y'), days_ascending=False)
 
 	#@unittest.skip('')
-	def test_main_archive_current_events_page(self):
+	def test_main_archived_current_events_page(self):
 		self.navigate_to_current_events_page()
 		month, year = self.select_random_month_year()
 		self.verify_date_headers(month, year, days_ascending=True)
+
+	####################
+	# Helper functions
+	####################
 
 	def navigate_to_current_events_page(self):
 		self.main = pages.MainPage(self.driver)
