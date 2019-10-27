@@ -203,7 +203,7 @@ class HomePage(BasePage):
 	#   waits for page title and URL to change
 	@wait_for.new_url_and_title
 	def submit_search(self):
-		self.driver.find_element(*HomePage.submit_search_button).click()
+		self.driver.find_element(*HomePage.submit_search_button).submit()
 
 	# Get the suggestions from the search input
 	# Returns a list of suggestions represented by dictionaries containing
