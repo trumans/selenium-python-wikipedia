@@ -8,14 +8,14 @@ Project organization
 
 # Prerequisites #
 * Python3
-* Python bindings for Selenium
-* Selenium browser drivers are in the directory referenced in test_wikipedia.py setup() method.
+* Selenium for Python
+* Selenium browser drivers are in the directory referenced in test_wikipedia.py - WikipediaCommon class - setUp method.
 
 Installation for supporting Selenium components can be found at 
 
 https://selenium-python.readthedocs.io/installation.html
 
-# Usage
+# Execution
 In terminal window
 1. navigate to folder with test scripts
 2. enter command: ```python3 test_wikipedia <browser>```
