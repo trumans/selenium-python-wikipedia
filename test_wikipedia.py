@@ -32,7 +32,7 @@ class WikipediaCommon(unittest.TestCase):
 	def tearDown(self):
 		self.driver.quit()
 
-#@unittest.skip('')
+@unittest.skip('')
 class TestHomePage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -318,7 +318,7 @@ class TestArticlePage(WikipediaCommon):
 		self.assertEqual(toc, headlines)
 
 
-@unittest.skip('')
+#@unittest.skip('')
 class TestCurrentEventsPage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -330,6 +330,9 @@ class TestCurrentEventsPage(WikipediaCommon):
 
 	#@unittest.skip('')
 	def test_main_archived_current_events_page(self):
+		if browser == "safari":
+			self.skipTest('Safari does not locate month_year link')
+
 		self.navigate_to_current_events_page()
 		month, year = self.select_random_month_year()
 		self.verify_date_headers(month, year, days_ascending=True)
