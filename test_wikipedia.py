@@ -58,6 +58,9 @@ class TestHomePage(WikipediaCommon):
 
 	#@unittest.skip('')
 	def test_homepage_english_link(self):
+		if browser == "safari":
+			self.skipTest('Safari does not click on home page language link as expected')
+
 		self.open_home_page()
 		self.click_language_link('English')
 		self.verify_main_page_text(
@@ -66,6 +69,9 @@ class TestHomePage(WikipediaCommon):
 
 	#@unittest.skip('')
 	def test_homepage_french_link(self):
+		if browser == "safari":
+			self.skipTest('Safari does not click on home page language link as expected')
+
 		self.open_home_page()
 		self.click_language_link('Français')
 		self.verify_main_page_text(
@@ -74,6 +80,9 @@ class TestHomePage(WikipediaCommon):
 
 	#@unittest.skip('')
 	def test_homepage_german_link(self):
+		if browser == "safari":
+			self.skipTest('Safari does not click on home page language link as expected')
+
 		self.open_home_page()
 		self.click_language_link('Deutsch')
 		self.verify_main_page_text(
@@ -82,6 +91,9 @@ class TestHomePage(WikipediaCommon):
 
 	#@unittest.skip('')
 	def test_homepage_spanish_link(self):
+		if browser == "safari":
+			self.skipTest('Safari does not click on home page language link as expected')
+
 		self.open_home_page()
 		self.click_language_link('Español')
 		self.verify_main_page_text(

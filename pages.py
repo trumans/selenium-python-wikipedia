@@ -237,9 +237,26 @@ class HomePage(BasePage):
 		return suggestions
 
 	def find_element_language_link(self, language):
-		#css = "a[href='//{}.wikipedia.org/']".format(language_code)
 		css = "[data-el-section='primary links'] a[title *= '{}']".format(language)
 		return self.driver.find_element(By.CSS_SELECTOR, css)
+
+		'''
+		Alternate locators attempted to work correctly with Safari
+		xpath = "//a//*[contains(text(), '{}')]".format(language)
+		return self.driver.find_element(By.XPATH, xpath)
+
+		ln = "en"
+		if language == "Deutsch":
+			ln = "de"
+		elif language == "Français":
+			ln = "fr"
+		elif language == "Español":
+			ln = "es"
+
+		css = "a[href='//{}.wikipedia.org/']".format(ln)
+		css = "[lang='{}'] a".format(ln) 
+		return self.driver.find_element(By.CSS_SELECTOR, css)
+		'''
 
 	# Click a specified language link
 	#   waits for page title and URL to change
