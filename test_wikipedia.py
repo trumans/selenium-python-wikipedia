@@ -388,7 +388,14 @@ if __name__ == '__main__':
 		global browser 
 		browser = sys.argv[1]
 		del sys.argv[1]  # remove so that unittest doesn't attempt to process argument
-		unittest.main(verbosity=2)
+
+		# Run all unit tests not marked with unittest.skip
+		# unittest.main(verbosity=2)
+
+		# Run by test suite
+		suite = unittest.TestLoader().loadTestsFromTestCase(TestCurrentEventsPage)
+		unittest.TextTestRunner(verbosity=2).run(suite)
+
 	else:
 		print("Argument missing or invalid. Expected one of",str(supported_browsers)[1:-1])
 
