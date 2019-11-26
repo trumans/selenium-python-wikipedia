@@ -32,7 +32,7 @@ class WikipediaCommon(unittest.TestCase):
 	def tearDown(self):
 		self.driver.quit()
 
-@unittest.skip('')
+
 class TestHomePage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -177,7 +177,7 @@ class TestHomePage(WikipediaCommon):
 		self.assertEqual(title_text, self.main.get_page_title())
 		self.assertIn(body_text, self.main.get_body_text().replace("\n", ''))
 
-@unittest.skip('')
+
 class TestMainPage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -244,7 +244,7 @@ class TestMainPage(WikipediaCommon):
 		self.assertNotIn(omitted_suggestion, titles)
 '''
 
-@unittest.skip('')
+
 class TestArticlePage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -318,7 +318,6 @@ class TestArticlePage(WikipediaCommon):
 		self.assertEqual(toc, headlines)
 
 
-#@unittest.skip('')
 class TestCurrentEventsPage(WikipediaCommon):
 
 	#@unittest.skip('')
@@ -389,12 +388,21 @@ if __name__ == '__main__':
 		browser = sys.argv[1]
 		del sys.argv[1]  # remove so that unittest doesn't attempt to process argument
 
-		# Run all unit tests not marked with unittest.skip
-		# unittest.main(verbosity=2)
+		# Gather one test suite
+		#tests = unittest.TestLoader().loadTestsFromTestCase(TestCurrentEventsPage)
 
-		# Run by test suite
-		suite = unittest.TestLoader().loadTestsFromTestCase(TestCurrentEventsPage)
-		unittest.TextTestRunner(verbosity=2).run(suite)
+		# Gather set of test suites
+		suite_list = [
+			TestHomePage,
+			TestMainPage,
+			TestArticlePage,
+			TestCurrentEventsPage,
+		]
+		suites = map(unittest.TestLoader().loadTestsFromTestCase, suite_list)
+		tests = unittest.TestSuite(suites)
+
+		# Run gathered tests
+		unittest.TextTestRunner(verbosity=2).run(tests)
 
 	else:
 		print("Argument missing or invalid. Expected one of",str(supported_browsers)[1:-1])
