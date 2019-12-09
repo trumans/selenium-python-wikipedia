@@ -346,11 +346,25 @@ class TestCurrentEventsPage(WikipediaCommon):
 		self.main.click_left_panel_link("Current events")
 
 	# Randomly select a month from the archives at the bottom of the page
-	#   only selects from the full years
+	#   Earliest expected archive is July 1994
+	#   Latest expected archive is the current month
 	# Returns the tuple (month, year) which was selected
 	def select_random_month_year(self):
-		year = str(random.randint(1995, 2018))  # update to include latest full year
-		month = self.main.month_name(random.randint(1,12))
+		current_year = datetime.datetime.now().year
+		current_month = datetime.datetime.now().month
+
+		year = str(random.randint(1994, current_year))
+		first_month = 1
+		last_month = 12
+
+		# adjust month range, if necessary
+		if year == 1994:
+			first_month = 7
+		elif year == current_year:
+			last_month = current_month
+
+		month = self.main.month_name(random.randint(first_month, last_month))
+
 		print("Verifying {} {}".format(month, year))
 		ce = pages.CurrentEventsPage(self.driver)
 		ce.click_link_archived_month(month, year)
