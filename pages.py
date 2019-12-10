@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import exceptions as SelExc
+from selenium.webdriver.common.action_chains import ActionChains
 
 class BasePage(object):
 
@@ -337,6 +338,7 @@ class CurrentEventsPage(BasePage):
 		link_css = "a[href*='{}_{}']".format(month, year)
 		box = self.driver.find_element(*self.events_by_month_box)
 		lnk = box.find_element(By.CSS_SELECTOR, link_css)
+		ActionChains(self.driver).move_to_element(lnk).perform()
 		self.click_link(lnk)
 
 	# Return the headers for each date on the page
