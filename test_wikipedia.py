@@ -281,8 +281,8 @@ class TestArticlePage(WikipediaCommon):
 
 	#@unittest.skip('')
 	def test_compare_toc_and_headlines(self):
-		self.open_article_by_search("Douglas Adams")
-		self.verify_article_toc_and_headers()
+		article = self.open_article_by_search("Douglas Adams")
+		self.verify_article_toc_and_headers(article)
 
 	####################
 	# Helper functions
@@ -292,6 +292,7 @@ class TestArticlePage(WikipediaCommon):
 		self.main = pages.MainPage(self.driver)
 		self.main.open_main_page()
 		self.main.open_article_by_search(search_term)
+		return pages.ArticlePage(self.driver)
 
 	# Template for testing info box contents
 	# Parameters:
@@ -301,9 +302,7 @@ class TestArticlePage(WikipediaCommon):
 	#     label is a string contained in the left side of a row in info box
 	#     value is a string contained in value on the right side
 	def infobox_test(self, search_term, expected_values):
-		self.open_article_by_search(search_term)
-
-		article = pages.ArticlePage(self.driver)
+		article = self.open_article_by_search(search_term)
 		infobox = article.get_infobox_contents()
 
 		# check expected values are in info box
@@ -311,8 +310,7 @@ class TestArticlePage(WikipediaCommon):
 			found_value = article.get_value_from_infobox_contents(infobox, label)
 			self.assertIn(expected_value, found_value)
 
-	def verify_article_toc_and_headers(self):
-		article = pages.ArticlePage(self.driver)
+	def verify_article_toc_and_headers(self, article):
 		toc = article.get_toc_items_text()
 		self.assertTrue(len(toc) > 0, "TOC is empty")
 		headlines = article.get_headlines_text()
@@ -429,7 +427,7 @@ class TestCurrentEventsPage(WikipediaCommon):
 			self.assertEqual(month, date_parsed[0])     # expected month
 			self.assertEqual(year, date_parsed[2])      # expected year
 			days.append( (int(date_parsed[2]),
-				          ce_page.month_index(date_parsed[0]), 
+				          ce_page.month_index(date_parsed[0]),
 				          int(date_parsed[1])) )	
 		# days are in expected sequence
 		self.assertEqual(days, sorted(days, reverse=(not days_ascending)))
@@ -449,8 +447,8 @@ if __name__ == '__main__':
 		suite_list = [
 #			TestHomePage,
 #			TestMainPage,
-#			TestArticlePage,
-			TestCurrentEventsPage,
+			TestArticlePage,
+#			TestCurrentEventsPage,
 		]
 		suites = map(unittest.TestLoader().loadTestsFromTestCase, suite_list)
 		tests = unittest.TestSuite(suites)
