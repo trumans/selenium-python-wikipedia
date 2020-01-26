@@ -34,38 +34,55 @@ class WikipediaCommon(unittest.TestCase):
 	def tearDown(self):
 		self.driver.quit()
 
+	# Open the home page
+	# returns
+	#   HomePage object
+	def open_home_page(self):
+		home = pages.HomePage(self.driver)
+		home.open_home_page()
+		return home
+
+	# Open the main page (English)
+	# returns
+	#   MainPage object
+	def open_main_page(self):
+		main = pages.MainPage(self.driver)
+		main.open_main_page()
+		return main
+
 
 class TestHomePage(WikipediaCommon):
 
 	#@unittest.skip('')
 	def test_homepage_title(self):
-		self.open_home_page()
-		self.verify_home_page_title()
+		home_page = self.open_home_page()
+		self.verify_home_page_title(home_page)
 
 	#@unittest.skip('')
 	# Safari doesn't display a tab unless multiple tabs are open.
 	def test_homepage_article_search(self):
 		search_term = "Buster Keaton"
-		self.open_home_page()
-		self.submit_search(search_term)
-		self.verify_article_page(search_term)
+		home_page = self.open_home_page()
+		article = self.submit_search(home_page, search_term)
+		self.verify_article_page(article, search_term)
 
 	#@unittest.skip('')
 	def test_homepage_autosuggest(self):
-		self.open_home_page()
-		self.type_search("bust")
-		self.verify_suggestions_start_with("bust")
-		self.type_search("er")
-		self.verify_suggestions_start_with("buster")
+		home_page = self.open_home_page()
+		self.type_search(home_page, "bust")
+		self.verify_suggestions_start_with(home_page, "bust")
+		self.type_search(home_page, "er")
+		self.verify_suggestions_start_with(home_page, "buster")
 
 	#@unittest.skip('')
 	def test_homepage_english_link(self):
 		if browser == "safari":
 			self.skipTest('Safari does not click on home page language link as expected')
 
-		self.open_home_page()
-		self.click_language_link('English')
+		home_page = self.open_home_page()
+		main_page = self.click_language_link(home_page, 'English')
 		self.verify_main_page_text(
+			main_page,
 			title_text="Wikipedia, the free encyclopedia",
 			body_text="the free encyclopedia that anyone can edit")
 
@@ -74,9 +91,10 @@ class TestHomePage(WikipediaCommon):
 		if browser == "safari":
 			self.skipTest('Safari does not click on home page language link as expected')
 
-		self.open_home_page()
-		self.click_language_link('Français')
+		home_page = self.open_home_page()
+		main_page = self.click_language_link(home_page, 'Français')
 		self.verify_main_page_text(
+			main_page,
 			title_text="Wikipédia, l'encyclopédie libre",
 			body_text="L'encyclopédie libre que chacun peut améliorer")
 
@@ -85,9 +103,10 @@ class TestHomePage(WikipediaCommon):
 		if browser == "safari":
 			self.skipTest('Safari does not click on home page language link as expected')
 
-		self.open_home_page()
-		self.click_language_link('Deutsch')
+		home_page = self.open_home_page()
+		main_page = self.click_language_link(home_page, 'Deutsch')
 		self.verify_main_page_text(
+			main_page,
 			title_text="Wikipedia – Die freie Enzyklopädie",
 			body_text="Wikipedia ist ein Projekt zum Aufbau einer Enzyklopädie aus freien Inhalten")
 
@@ -96,9 +115,10 @@ class TestHomePage(WikipediaCommon):
 		if browser == "safari":
 			self.skipTest('Safari does not click on home page language link as expected')
 
-		self.open_home_page()
-		self.click_language_link('Español')
+		home_page = self.open_home_page()
+		main_page = self.click_language_link(home_page, 'Español')
 		self.verify_main_page_text(
+			main_page,
 			title_text="Wikipedia, la enciclopedia libre",
 			body_text="la enciclopedia de contenido libreque todos pueden editar")
 
@@ -106,209 +126,194 @@ class TestHomePage(WikipediaCommon):
 	# Helper functions
 	####################
 
-	# create the home page object and open the page
-	def open_home_page(self):
-		self.home = pages.HomePage(self.driver)
-		self.home.open_home_page()
+	# Verify the home page title
+	# parameter
+	#   home_page - HomePage object
+	def verify_home_page_title(self, home_page):
+		self.assertEqual(home_page.get_page_title(), "Wikipedia")
 
-	def verify_home_page_title(self):
-		self.assertEqual(self.home.get_page_title(), "Wikipedia")
+	# Submit a search
+	# parameters
+	#   home_page - HomePage object
+	#   search_term - string, text to enter and submit
+	# returns
+	#   ArticlePage object
+	def submit_search(self, home_page, search_term):
+		home_page.enter_search_term(search_term)
+		home_page.submit_search()
+		return pages.ArticlePage(self.driver)
 
-	def submit_search(self, search_term):
-		self.open_home_page()
-		self.home.enter_search_term(search_term)
-		self.home.submit_search()
+	# Type text into search term, but not submit
+	# parameters
+	#   home_page - HomePage object
+	#   search_term - string, text to enter
+	def type_search(self, home_page, search_term):
+		home_page.enter_search_term(search_term)
 
-	def click_language_link(self, lang):
-		self.home.click_language_link(lang)
+	# Click a language link
+	# parameters
+	#   home_page - HomePage object
+	#   lang - string, two character language code
+	# returns
+	#   MainPage object
+	def click_language_link(self, home_page, lang):
+		home_page.click_language_link(lang)
+		return pages.MainPage(self.driver)
 
-	def verify_article_page(self, search_term):
+	# Verify article page title, URL and header
+	# parameters
+	#   article - ArticlePage object
+	#   search_term - string, text to expect in elements of article page
+	def verify_article_page(self, article, search_term):
 		# check the resulting page has the correct header & title
-		title_regex = "^{0}.*".format(search_term)
+		title_regex = "^{}.*".format(search_term)
 		encoded_search_term = search_term.replace(" ", "_")
-		url_regex   = ".*{0}$".format(encoded_search_term)
+		url_regex   = ".*{}$".format(encoded_search_term)
 
-		article = pages.ArticlePage(self.driver)
 		s = article.get_page_title()
-		self.assertTrue(re.search(title_regex, s), 
-			"Page title '{}' does not start with search term '{}'".format(s, search_term))
+		self.assertRegex(s, title_regex)
 		s = article.get_current_url()
-		self.assertTrue(re.search(url_regex, s), 
-			"URL '{}' does not end with search term '{}'".format(s, encoded_search_term))
+		self.assertRegex(s, url_regex)
 		self.assertEqual(article.get_article_header(), search_term)
 
-	# type text into search term, but not submit
-	def type_search(self, search_term):
-		self.home.enter_search_term(search_term)
-
-	def verify_suggestions_start_with(self, search_term):
-		prefix = search_term.lower()
-		for suggestion in self.home.get_search_suggestions():
+	# Verify the suggestions displayed with search file
+	# parameters
+	#   home_page - HomePage object
+	#   search_term - string, expected text in suggestions
+	def verify_suggestions_start_with(self, home_page, search_term):
+		regex = "^{}.*".format(search_term.lower())
+		for suggestion in home_page.get_search_suggestions():
 			title = suggestion['title'].lower()
-			self.assertTrue(title.startswith(prefix),
-				"Suggestion '{}' expected to start with '{}'".format(title, prefix))
-
-	'''
-    NO LONGER USED. REMOVED IN THE FUTURE
-
-	def verify_suggestions_contain(self, search_str):
-		suggestions = self.home.get_search_suggestions()
-		titles = [suggestion['title'] for suggestion in suggestions]
-		error_msg = "'{}' not found in titles {}"
-		matching = [title for title in titles if title.startswith(search_str)]
-		self.assertNotEqual(matching, [], error_msg.format(search_str, titles))
-		
-	def verify_suggestions_do_not_contain(self, search_str):
-		suggestions = self.home.get_search_suggestions()
-		titles = [suggestion['title'] for suggestion in suggestions]
-		error_msg = "'{}' found in titles {}"
-		matching = [title for title in titles if title.startswith(search_str)]
-		self.assertEqual(matching, [], error_msg.format(search_str, titles))
-	'''
+			self.assertRegex(title, regex)
 
 	# Verify text on the main page
 	# Parameters
+	#   main_page - MainPage object
 	#   title_text - expected text in the title (browser tab)
 	#   body_text - expected text somewhere in body
 	#
-	# declare a main-page object
 	# asserts the title/tab is the expected text
 	# asserts the page body contains the expected text
-	def verify_main_page_text(self, title_text, body_text):
-		self.main = pages.MainPage(self.driver)
-		self.assertEqual(title_text, self.main.get_page_title())
-		self.assertIn(body_text, self.main.get_body_text().replace("\n", ''))
+	def verify_main_page_text(self, main_page, title_text, body_text):
+		self.assertEqual(title_text, main_page.get_page_title())
+		self.assertIn(body_text, main_page.get_body_text().replace("\n", ''))
 
 
 class TestMainPage(WikipediaCommon):
 
 	#@unittest.skip('')
 	def test_mainpage_article_search(self):
-		self.open_main_page()
-		self.search_for_article("Disneyland")
+		search_term = "Disneyland"
+
+		main_page = self.open_main_page()
+		article = self.search_for_article(main_page, search_term)
 
 		# check the resulting page has the correct header & title
-		article = pages.ArticlePage(self.driver)
 		s = article.get_page_title()
-		self.assertTrue(re.search("^Disneyland.*", s), 
-			"Page title '{}' is unexpected".format(s))
+		self.assertRegex(s, "^{}.*".format(search_term))
 		s = article.get_current_url()
-		self.assertTrue(re.search(".*Disneyland$", s), 
-			"URL '{}'  is unexpected".format(s))
-		self.assertEqual(article.get_article_header(), "Disneyland")
+		self.assertRegex(s, ".*{}$".format(search_term))
+		self.assertEqual(article.get_article_header(), search_term)
 
 	#@unittest.skip('')
 	def test_mainpage_autosuggest(self):
 		if browser == "safari":
 			self.skipTest('main page search does not return autosuggest on Safari')
 
-		self.open_main_page()
-		self.type_search("dou")
-		self.verify_suggestions_start_with("dou")
-		self.type_search("glas") # extend search term
-		self.verify_suggestions_start_with("douglas")
+		main_page = self.open_main_page()
+		self.type_search(main_page, "dou")
+		self.verify_suggestions_start_with(main_page, "dou")
+		self.type_search(main_page, "glas") # extend search term
+		self.verify_suggestions_start_with(main_page, "douglas")
 
 	####################
 	# Helper functions
 	####################
 
-	def open_main_page(self):
-		self.main = pages.MainPage(self.driver)
-		self.main.open_main_page()
-
-	def search_for_article(self, search_term):
-		self.main.open_article_by_search(search_term)
+	def search_for_article(self, main_page, search_term):
+		main_page.open_article_by_search(search_term)
+		return pages.ArticlePage(self.driver)
 
 	# Type a search term without submitting search
-	def type_search(self, search_term):
-		self.main.enter_header_search_term(search_term)
+	# parameters
+	#   main_page - MainPage object
+	#   search_term - string, text for search
+	def type_search(self, main_page, search_term):
+		main_page.enter_header_search_term(search_term)
 
-	def verify_suggestions_start_with(self, search_term):
-		prefix = search_term.lower()
-		for suggestion in self.main.get_header_search_suggestions():
+	# Verify the suggestions from the search field
+	# parameters
+	#   main_page - MainPage object
+	#   search_term - string, text expected in suggestions
+	def verify_suggestions_start_with(self, main_page, search_term):
+		regex = "^{}.*".format(search_term.lower())
+		for suggestion in main_page.get_header_search_suggestions():
 			title = suggestion['title'].lower()
-			self.assertTrue(title.startswith(prefix), 
-				"Suggestion '{}' expected to start with '{}'".format(title, prefix))
-
-'''
-    NO LONGER USED. REMOVED IN THE FUTURE
-
-	def verify_suggestions_contain(self, expected_suggestion):
-		titles = []
-		for suggestion in self.main.get_header_search_suggestions():
-			titles.append(suggestion['title'])
-		self.assertIn(expected_suggestion, titles)
-
-	def verify_suggestions_do_not_contain(self, omitted_suggestion):
-		titles = []
-		for suggestion in self.main.get_header_search_suggestions():
-			titles.append(suggestion['title'])
-		self.assertNotIn(omitted_suggestion, titles)
-'''
+			self.assertRegex(title, regex)
 
 
 class TestArticlePage(WikipediaCommon):
 
-	#@unittest.skip('')
 	def test_infobox_for_country(self):
-		expected_values = (('Currency', "Sol"), ('Capital', "Lima"))
-		self.infobox_test("Peru", expected_values)
+		self.infobox_test(
+			"Peru", (('Currency', "Sol"), ('Capital', "Lima")))
 
-	#@unittest.skip('')
 	def test_infobox_for_chemistry(self):
-		expected_values = (('atomic weight', "15.999"), ('Phase at STP', "gas"))
-		self.infobox_test("Oxygen", expected_values)
+		self.infobox_test(
+			"Oxygen", (('atomic weight', "15.999"), ('Phase at STP', "gas")))
 
-	#@unittest.skip('')
 	def test_infobox_for_person(self):
-		expected_values = (('Born', '1889'), ('Relatives', 'Chaplin'))
-		self.infobox_test("Charlie Chaplin", expected_values)
+		self.infobox_test(
+			"Charlie Chaplin", (('Born', '1889'), ('Relatives', 'Chaplin')))
 
-	#@unittest.skip('')
 	def test_infobox_for_movie(self):
-		expected_values = (('Directed', 'Alfred Hitchcock'), ('Starring', 'Cary Grant'))
-		self.infobox_test("north by northwest", expected_values)
+		self.infobox_test(
+			"north by northwest",
+			(('Directed', 'Alfred Hitchcock'), ('Starring', 'Cary Grant')))
 
-	#@unittest.skip('')
 	def test_infobox_for_holiday(self):
-		expected_values = (('Significance', 'pranks'), ('Frequency', 'Annual'))
-		self.infobox_test("april fool's day", expected_values)
+		self.infobox_test(
+			"april fool's day",
+			(('Significance', 'pranks'), ('Frequency', 'Annual')))
 
-	#@unittest.skip('')
 	def test_infobox_for_song(self):
-		expected_values = (('Recorded', '1968'), ('Songwriter(s)', 'Lennon'))
-		self.infobox_test("rocky raccoon", expected_values)
+		self.infobox_test(
+			"rocky raccoon",
+			(('Recorded', '1968'), ('Songwriter(s)', 'Lennon')))
 
-	#@unittest.skip('')
 	def test_compare_toc_and_headlines(self):
-		article = self.open_article_by_search("Douglas Adams")
+		main = self.open_main_page()
+		article = self.open_article_by_search(main, "Douglas Adams")
 		self.verify_article_toc_and_headers(article)
 
 	####################
 	# Helper functions
 	####################
 
-	def open_article_by_search(self, search_term):
-		self.main = pages.MainPage(self.driver)
-		self.main.open_main_page()
-		self.main.open_article_by_search(search_term)
-		return pages.ArticlePage(self.driver)
-
 	# Template for testing info box contents
-	# Parameters:
-	#   search_term: search text to open an article.
+	# parameters
+	#   search_term - string, search text to open an article.
 	#     assumes search does not open a disambiguration page
-	#   expected_value: list of (label, value) tuples where
+	#   expected_values - list of (label, value) tuples where
 	#     label is a string contained in the left side of a row in info box
 	#     value is a string contained in value on the right side
 	def infobox_test(self, search_term, expected_values):
-		article = self.open_article_by_search(search_term)
+		main_page = self.open_main_page()
+		article = self.open_article_by_search(main_page, search_term)
 		infobox = article.get_infobox_contents()
 
 		# check expected values are in info box
 		for (label, expected_value) in expected_values:
 			found_value = article.get_value_from_infobox_contents(infobox, label)
 			self.assertIn(expected_value, found_value)
+
+	# Submits a search from the main page
+	# parameter
+	#   main_page - MainPage object
+	#   search_term - string, text to enter for search
+	def open_article_by_search(self, main_page, search_term):
+		main_page.open_article_by_search(search_term)
+		return pages.ArticlePage(self.driver)
 
 	def verify_article_toc_and_headers(self, article):
 		toc = article.get_toc_items_text()
@@ -445,10 +450,10 @@ if __name__ == '__main__':
 
 		# Gather set of test suites
 		suite_list = [
-#			TestHomePage,
-#			TestMainPage,
+			TestHomePage,
+			TestMainPage,
 			TestArticlePage,
-#			TestCurrentEventsPage,
+			TestCurrentEventsPage,
 		]
 		suites = map(unittest.TestLoader().loadTestsFromTestCase, suite_list)
 		tests = unittest.TestSuite(suites)
