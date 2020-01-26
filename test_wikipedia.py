@@ -1,9 +1,10 @@
 import sys
 import time
-import datetime
+from datetime import datetime
 import unittest
 import re
 import random
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -19,7 +20,8 @@ class WikipediaCommon(unittest.TestCase):
 		elif browser == 'ie':
 			self.driver = webdriver.Ie()
 		elif browser == 'chrome':
-			self.driver = webdriver.Chrome(executable_path='/selenium_browser_drivers/chromedriver')
+			self.driver = webdriver.Chrome()  # use driver in system path /usr/local/bin on Unix
+			#self.driver = webdriver.Chrome(executable_path='/path_to/chromedriver')
 		elif browser == 'safari':
 			self.driver = webdriver.Safari()
 			self.driver.set_window_position(20,20)
@@ -323,7 +325,7 @@ class TestCurrentEventsPage(WikipediaCommon):
 	#@unittest.skip('')
 	def test_main_current_events_page(self):
 		self.navigate_to_current_events_page()
-		now = datetime.datetime.now()
+		now = datetime.now()
 		self.verify_date_headers(
 			now.strftime('%B'), now.strftime('%Y'), days_ascending=False)
 
@@ -335,6 +337,10 @@ class TestCurrentEventsPage(WikipediaCommon):
 		self.navigate_to_current_events_page()
 		month, year = self.select_random_month_year()
 		self.verify_date_headers(month, year, days_ascending=True)
+
+	def test_archived_months_link_text(self):
+		self.navigate_to_current_events_page()
+		self.verify_archives_link_text()
 
 	####################
 	# Helper functions
@@ -350,25 +356,52 @@ class TestCurrentEventsPage(WikipediaCommon):
 	#   Latest expected archive is the current month
 	# Returns the tuple (month, year) which was selected
 	def select_random_month_year(self):
-		current_year = datetime.datetime.now().year
-		current_month = datetime.datetime.now().month
+		self.ce = pages.CurrentEventsPage(self.driver)
+		year = random.randint(self.ce.first_archived_year, datetime.now().year)
 
-		year = str(random.randint(1994, current_year))
-		first_month = 1
-		last_month = 12
-
-		# adjust month range, if necessary
-		if year == 1994:
-			first_month = 7
-		elif year == current_year:
-			last_month = current_month
-
-		month = self.main.month_name(random.randint(first_month, last_month))
+		first_month, last_month = self.ce.get_month_range(year)
+		month = self.ce.month_name(random.randint(first_month, last_month))
 
 		print("Verifying {} {}".format(month, year))
-		ce = pages.CurrentEventsPage(self.driver)
-		ce.click_link_archived_month(month, year)
+		self.ce.click_link_archived_month(month, year)
 		return (month, year)
+
+	# Verify link text on the archived months
+	# Expect to find links July 1994 to the current month
+	def verify_archives_link_text(self):
+		current_year = datetime.now().year
+		self.ce = pages.CurrentEventsPage(self.driver)
+
+		years = self.ce.get_archive_links_by_year()
+		for yr in years:
+
+			links = self.ce.parse_archive_links(yr)
+
+			# verify the first link is the year
+			yr_str = str(current_year)
+			self.assertEqual(links[0]["text"], yr_str)
+			self.assertEqual(links[0]["title"], yr_str)
+			self.assertRegex(links[0]["href"], ".*/wiki/" + yr_str)
+
+			# verify the remaining links are months
+			#   while most years will be months# 1-12
+			#   the first archived and current year will be fewer months
+			first_month, last_month = self.ce.get_month_range(current_year)
+			current_month = first_month
+
+			for i in range(1, len(links)):
+				month_name = self.ce.month_name(current_month)
+
+				self.assertEqual(links[i]["text"], month_name)
+				regex = ".*{} {}$".format(month_name, yr_str)
+				self.assertRegex(links[i]["title"], regex)
+				regex = ".*/{}_{}$".format(month_name, yr_str)
+				self.assertRegex(links[i]["href"], regex)
+
+				current_month += 1
+
+			current_year -= 1
+
 
 	# Verify the headers for dates
 	#   verify headers are the expected format (ex: Janurary 1, 1999 (Monday))
@@ -407,9 +440,9 @@ if __name__ == '__main__':
 
 		# Gather set of test suites
 		suite_list = [
-			TestHomePage,
-			TestMainPage,
-			TestArticlePage,
+#			TestHomePage,
+#			TestMainPage,
+#			TestArticlePage,
 			TestCurrentEventsPage,
 		]
 		suites = map(unittest.TestLoader().loadTestsFromTestCase, suite_list)

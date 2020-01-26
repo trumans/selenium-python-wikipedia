@@ -1,5 +1,6 @@
 import sys
 import time
+from datetime import datetime
 import re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -326,8 +327,56 @@ class ArticlePage(BasePage):
 
 class CurrentEventsPage(BasePage):
 
+	first_archived_year = 1994
+	first_archived_month = 7
 	date_header = (By.CSS_SELECTOR, "[role='heading'] [class='summary']")
 	events_by_month_box = (By.CSS_SELECTOR, "[aria-labelledby='Events_by_month']")
+	year_archives = (By.CSS_SELECTOR, "[aria-labelledby='Events_by_month'] .hlist dl")
+
+	# Return the expected first and last month of an archived year
+	#   parameter
+	#     year - integer in range of first archived and current year
+	#   returns - tuple of integers (first_month, last_month)
+	def get_month_range(self, year):
+		current_year = datetime.now().year
+
+		# raise exception if year is out of range
+		if year < self.first_archived_year or year > current_year:
+			msg = "Year must be between {} and {}, value is {}."
+			raise ValueError(msg.format(self.first_archived_year, current_year, year))
+
+		first_month = 1
+		last_month = 12
+		# adjust month range, as necessary
+		if year == self.first_archived_year:
+			first_month = self.first_archived_month
+		elif year == current_year:
+			last_month = datetime.now().month
+
+		return (first_month, last_month)
+
+	# Get archive links by year for all years
+	# return: list of elements containing each year
+	def get_archive_links_by_year(self):
+		return self.driver.find_elements(*self.year_archives)
+
+	# Create a list of link attributes
+	# parameter:
+	#   links_parent - web element containing <a> nodes
+	# return: list of dictionaries containing the href, title and text
+	#   from <a> node
+	def parse_archive_links(self, links_parent):
+
+		links = links_parent.find_elements(By.CSS_SELECTOR, "a")
+
+		def get_attributes(el):
+			hr = el.get_attribute("href")
+			ti = el.get_attribute("title")
+			tx = el.text
+			return { "href": hr, "title": ti, "text": tx }
+
+		yr = map(get_attributes, links)
+		return list(yr)
 
 	# Open the page for current events archive for a month and year
 	#   using links at the bottom of current events page
