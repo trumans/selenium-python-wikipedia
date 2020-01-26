@@ -1,10 +1,21 @@
 
-The project uses Python and Selenium WebDriver with a page-object model structure to verify web elements on Wikipedia.org. Test cases use the PyUnit/unittest framework.
+The project uses Python and Selenium WebDriver with a page-object model structure to verify Wikipedia.org. Test cases use the PyUnit/unittest framework.
 
-Project organization
-* **test_wikipedia.py** - defines test cases using the PyUnit convention of method names beginning with "test_" in the class names beginning with "Test". Test case methods call helper functions defined in the same class which create page object instances and call related methods. This aids readability by allowing tests definitions to have a concise sequence of function calls.
-* **pages.py** - defines classes for each page containing web element locators and methods to interact with the elements.
-* **wait_for.py** - decorator to wait for a web element to be present before continuing.
+# Code organization #
+## test_wikipedia.py ## 
+### Test Cases ###
+* Test cases methods names beginning with "test_" in the class names that begin with "Test".
+* Test cases begin with calling an open_some_page method to receive a page object which it passes to helper functions that interact or verify with the page.
+* Whenever a test case calls a method that triggers a new page, it expects to receive a page object from the method for the new page.
+### Helper Functions ###
+* Defined in the class with test cases they support
+* Call page object methods which call Selenium.
+* Helper method that trigger the need for a new page object (e.g. click which opens an new page) returns the appropriate page object for the destination page.
+## pages.py ##
+* Defines classes for each web page 
+* Defines web element locators and methods that call Selenium.
+## wait_for.py ##
+* Decorator to wait for a web element to be present before continuing.
 
 
 # Prerequisites #
