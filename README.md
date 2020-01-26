@@ -4,6 +4,7 @@ The project uses Python and Selenium WebDriver with a page-object model structur
 Project organization
 * **test_wikipedia.py** - defines test cases using the PyUnit convention of method names beginning with "test_" in the class names beginning with "Test". Test case methods call helper functions defined in the same class which create page object instances and call related methods. This aids readability by allowing tests definitions to have a concise sequence of function calls.
 * **pages.py** - defines classes for each page containing web element locators and methods to interact with the elements.
+* **wait_for.py** - decorator to wait for a web element to be present before continuing.
 
 
 # Prerequisites #
