@@ -357,6 +357,30 @@ class TestCurrentEventsPage(WikipediaCommon):
 		self.main.click_left_panel_link("Current events")
 		return pages.CurrentEventsPage(self.driver)
 
+	# Return the expected first and last month of an archived year
+	#   parameter
+	#     ce - CurrentEventsPage object
+	#     year - integer in the range of first archived and current year
+	#   returns
+	#     tuple of integers (first_month, last_month)
+	def get_month_range(self, ce, year):
+		current_year = datetime.now().year
+
+		# raise exception if year is out of range
+		if year < ce.first_archived_year or year > current_year:
+			msg = "Year must be between {} and {}, value is {}."
+			raise ValueError(msg.format(ce.first_archived_year, current_year, year))
+
+		first_month = 1
+		last_month = 12
+		# adjust month range, as necessary
+		if year == ce.first_archived_year:
+			first_month = ce.first_archived_month
+		elif year == current_year:
+			last_month = datetime.now().month
+
+		return (first_month, last_month)
+
 	# Randomly select a month from the archives at the bottom of the page
 	#   Earliest expected archive is July 1994
 	#   Latest expected archive is the current month
@@ -367,7 +391,7 @@ class TestCurrentEventsPage(WikipediaCommon):
 	def select_random_month_year(self, ce_page):
 		year = random.randint(ce_page.first_archived_year, datetime.now().year)
 
-		first_month, last_month = ce_page.get_month_range(year)
+		first_month, last_month = self.get_month_range(ce_page, year)
 		month = ce_page.month_name(random.randint(first_month, last_month))
 
 		print("Verifying {} {}".format(month, year))
@@ -396,7 +420,7 @@ class TestCurrentEventsPage(WikipediaCommon):
 			# verify the remaining links are months
 			#   while most years will be months# 1-12
 			#   the first archived and current year will be fewer months
-			first_month, last_month = ce_page.get_month_range(current_year)
+			first_month, last_month = self.get_month_range(ce_page, current_year)
 			current_month = first_month
 
 			for i in range(1, len(links)):

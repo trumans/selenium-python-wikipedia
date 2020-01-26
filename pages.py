@@ -333,28 +333,6 @@ class CurrentEventsPage(BasePage):
 	events_by_month_box = (By.CSS_SELECTOR, "[aria-labelledby='Events_by_month']")
 	year_archives = (By.CSS_SELECTOR, "[aria-labelledby='Events_by_month'] .hlist dl")
 
-	# Return the expected first and last month of an archived year
-	#   parameter
-	#     year - integer in range of first archived and current year
-	#   returns - tuple of integers (first_month, last_month)
-	def get_month_range(self, year):
-		current_year = datetime.now().year
-
-		# raise exception if year is out of range
-		if year < self.first_archived_year or year > current_year:
-			msg = "Year must be between {} and {}, value is {}."
-			raise ValueError(msg.format(self.first_archived_year, current_year, year))
-
-		first_month = 1
-		last_month = 12
-		# adjust month range, as necessary
-		if year == self.first_archived_year:
-			first_month = self.first_archived_month
-		elif year == current_year:
-			last_month = datetime.now().month
-
-		return (first_month, last_month)
-
 	# Get archive links by year for all years
 	# return: list of elements containing each year
 	def get_archive_links_by_year(self):
