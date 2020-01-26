@@ -3,17 +3,20 @@ The project uses Python and Selenium WebDriver with a page-object model structur
 
 # Code organization #
 ## test_wikipedia.py ## 
-### Test Cases ###
-* Test cases methods names beginning with "test_" in the class names that begin with "Test".
+**Test Cases**
+* Test cases are methods with names beginning with "test_" in the class names that begin with "Test".
 * Test cases begin with calling an open_some_page method to receive a page object which it passes to helper functions that interact or verify with the page.
 * Whenever a test case calls a method that triggers a new page, it expects to receive a page object from the method for the new page.
-### Helper Functions ###
+
+**Helper Functions**
 * Defined in the class with test cases they support
-* Call page object methods which call Selenium.
-* Helper method that trigger the need for a new page object (e.g. click which opens an new page) returns the appropriate page object for the destination page.
+* When called their first parameter is generally a page object needed to call the methods that call Selenium. Generally they do not directly call Selenium
+* Handle verification logic and assertions about a page
+* Helper methods that trigger the need for a new page object (e.g. click which opens an new page) returns the appropriate page object for the destination page
 ## pages.py ##
 * Defines classes for each web page 
 * Defines web element locators and methods that call Selenium.
+* Limited to interacting or retrieving elements, attributes or text from the web page. Does not evaluate or verify the page.
 ## wait_for.py ##
 * Decorator to wait for a web element to be present before continuing.
 
